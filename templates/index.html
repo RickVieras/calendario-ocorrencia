@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block content %}
+<main class="container">
+  <header class="hero">
+    <div><p class="eyebrow">PLANEJAMENTO OPERACIONAL</p><h1>Calendário de ocorrências</h1><p class="subtitle">Registre os fatos que influenciam a operação diária.</p></div>
+    <button class="primary" id="abrir-modal">+ Nova ocorrência</button>
+  </header>
+
+  {% with mensagens = get_flashed_messages(with_categories=true) %}
+    {% for categoria, mensagem in mensagens %}<div class="alerta {{ categoria }}">{{ mensagem }}</div>{% endfor %}
+  {% endwith %}
+
+  <section class="toolbar">
+    <a class="seta" href="/?ano={{ ano - 1 }}" aria-label="Ano anterior">←</a>
+    <strong>{{ ano }}</strong>
+    <a class="seta" href="/?ano={{ ano + 1 }}" aria-label="Próximo ano">→</a>
+    <span class="contador">{{ ocorrencias|length }} registro{{ '' if ocorrencias|length == 1 else 's' }} no ano</span>
+  </section>
+
+  <section id="calendario" data-ano="{{ ano }}" data-ocorrencias='{{ ocorrencias|tojson }}'></section>
+
+  <section class="legenda">
+    <span><i class="dot greve"></i> Greve</span><span><i class="dot acidente"></i> Acidente</span><span><i class="dot clima"></i> Clima</span><span><i class="dot operacional"></i> Operacional</span><span><i class="dot outro"></i> Outro</span>
+  </section>
+</main>
+
+<dialog id="modal"><form method="post" action="{{ url_for('adicionar_ocorrencia') }}">
+  <div class="modal-topo"><div><p class="eyebrow">NOVO REGISTRO</p><h2>Adicionar ocorrência</h2></div><button class="fechar" type="button" id="fechar-modal">×</button></div>
+  <label>Data<input type="date" name="data" id="campo-data" required></label>
+  <label>Título<input type="text" name="titulo" maxlength="90" placeholder="Ex.: Acidente na Avenida..." required></label>
+  <label>Categoria<select name="categoria"><option>Operacional</option><option>Greve</option><option>Acidente</option><option>Clima</option><option>Outro</option></select></label>
+  <label>Observações<textarea name="descricao" rows="4" placeholder="Descreva o ocorrido, impactos e providências..."></textarea></label>
+  <button class="primary largura-total" type="submit">Salvar ocorrência</button>
+</form></dialog>
+
+<dialog id="modal-detalhes"><div id="conteudo-detalhes"></div></dialog>
+{% endblock %}
